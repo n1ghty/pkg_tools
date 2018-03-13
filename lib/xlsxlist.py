@@ -39,7 +39,7 @@ def writeFile(pkgInfos, fieldnames, filename):
 	worksheets['upd'] = writeSheet(workbook, 'upd', 'Updates', pkgInfos, fieldnames)
 	worksheets['ps2'] = writeSheet(workbook, 'ps2', 'PS2', pkgInfos, fieldnames)
 
-	if ('err' in pkgInfos):
+	if (('err' in pkgInfos) and (len(pkgInfos['err']) > 0)):
 		worksheets['err'] = workbook.add_worksheet('Failures')
 		for i in range(len(pkgInfos['err'])):
 			worksheets['err'].write(i + 1, 0, pkgInfos['err'][i])
