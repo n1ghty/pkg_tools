@@ -219,6 +219,13 @@ def getPkgInfo(pkg_file_path):
 						languages.append(v)
 			pkg_info['LANGUAGES'] = ','.join(languages)
 
+			# add combined version for update / game versions
+			if (pkg_info['CATEGORY'] == 'gp'):
+				# update, replace version
+				pkg_info['VER'] = pkg_info['APP_VER'] + '(U)'
+			else:
+				pkg_info['VER'] = pkg_info['VERSION']
+
 			pkg_file.close()
 			return pkg_info
 

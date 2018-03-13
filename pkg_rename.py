@@ -95,13 +95,6 @@ def renamePkg(pkg_file_path):
 		pkgInfo = pkg_parser.getPkgInfo(pkg_file_path)
 
 		if (pkgInfo):
-			# add combined version for update / game versions
-			if (pkgInfo['CATEGORY'] == 'gp'):
-				# update, replace version
-				pkgInfo['VER'] = pkgInfo['APP_VER'] + '(U)'
-			else:
-				pkgInfo['VER'] = pkgInfo['VERSION']
-
 			format_out = ''
 			if (args.custom_format):
 				# use custom formatting

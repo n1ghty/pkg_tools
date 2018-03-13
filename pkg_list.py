@@ -1,5 +1,5 @@
 ## pkg_list by n1ghty
-REL_VERSION = 'v1.1.0'
+REL_VERSION = 'v1.1.1'
 
 import sys, os, struct, traceback, xlsxwriter, argparse
 from lib import pkg_parser, xlsxlist
