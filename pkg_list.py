@@ -46,7 +46,12 @@ parser.add_argument('-o', dest='outfile', type=unicode, help='specify the output
 
 parser.set_defaults(column=['TITLE', 'TITLE_ID', 'REGION', 'VER', 'CONTENT_ID', 'SIZE'], outfile='pkg_list')
 
-args = parser.parse_args()
+try:
+	args = parser.parse_args()
+except:
+	print
+	print "See help (-h) for commands"
+	sys.exit()
 
 # arg cleanup
 if (args.sort):

@@ -1,5 +1,5 @@
 ## pkg_rename by n1ghty
-REL_VERSION = 'v1.1.0'
+REL_VERSION = 'v1.1.1'
 
 import sys, os, struct, traceback, re, codecs, argparse
 from lib import pkg_parser
@@ -55,7 +55,12 @@ parser.add_argument('-n', dest='name_format', action='store_true', help='use a r
 parser.add_argument('-d', dest='dir', action='store_true', help='rename all files in the specified directory')
 parser.add_argument('-r', dest='recursive', action='store_true', help='include subdirectories')
 
-args = parser.parse_args()
+try:
+	args = parser.parse_args()
+except:
+	print
+	print "See help (-h) for commands"
+	sys.exit()
 
 if (args.dir):
 	pkg_path = args.pkg_path
