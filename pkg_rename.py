@@ -1,8 +1,8 @@
 ## pkg_rename by n1ghty
-REL_VERSION = 'v1.1.1'
+REL_VERSION = 'v1.1.2'
 
 import sys, os, struct, traceback, re, codecs, argparse
-from lib import pkg_parser
+from lib import pkg_parser, common
 
 sys.stdout = codecs.getwriter('utf8')(sys.stdout)
 sys.stderr = codecs.getwriter('utf8')(sys.stderr)
@@ -11,7 +11,6 @@ print 'pkg_tools / pkg_rename ' + REL_VERSION + ' by n1ghty'
 NAME_FORMAT = u'%TITLE% (%TITLE_ID%) [v%VER%]'
 
 ## parse arguments
-from argparse import RawTextHelpFormatter
 parser = argparse.ArgumentParser(
 	description = 'This tool renames PS4 pkg files to the sony format (default), a readable\n'
 											'name format or a custom specified format.\n'
@@ -21,33 +20,12 @@ parser = argparse.ArgumentParser(
 											'E.g. \'%TITLE% (%TITLE_ID%)\' will result in \'Game name (CUSA01234)\'\n'
 											'\n'
 											'Available values for formatting:\n'
-											' - Values from param.sfo like\n'
-											'   TITLE, TITLE_ID, CONTENT_ID, VERSION, APP_VER, PARENTAL_LEVEL, \n'
-											'   SYSTEM_VER, ...\n'
-											' - LANGUAGES\n'
-											'   The list of title name languages, e.g. \'EN,FR,RU\'\n'
-											'   This does not always reflect supported languages.'
-											' - VER\n'
-											'   Equals VERSION for a game / an application and APP_VER(U) for an update\n'
-											' - REGION\n'
-											'   The region of the pkg (CN, EU, US)\n'
-											' - SIZE\n'
-											'   The filesize in a readable format, e.g. \'1.1 GB\'\n'
-											' - SYS_VER\n'
-											'   The required system version number in a readable format, e.g. \'2.70\'\n'
-											' - SDK_VER\n'
-											'   The used sdk version number in a readable format, e.g. \'2.70\'\n'
-											' - TITLE_XX\n'
-											'   The title name in a specific language XX. If not available, the default\n'
-											'   language is used.\n'
-											'\n'
-											'   Available language codes:\n'
-											'     JA, EN, FR, ES, DE, IT, NL, PT, RU, KO, CH, ZH, FI, SV, DA,\n'
-											'     NO, PL, BR, GB, TR, LA, AR, CA, CS, HU, EL, RO, TH, VI, IN \n'
+											+ pkg_parser.AVAILABLE_VALUES +
 											'\n'
 											'The readable name format (-n) uses the following format:\n'
 											'\'' + NAME_FORMAT + '\'',
-	formatter_class=argparse.RawDescriptionHelpFormatter)
+	formatter_class=common.Formatter
+	)
 parser.add_argument('pkg_path', type=unicode, help='the pkg file which shall be renamed (or directory when used with -d)')
 parser.add_argument('-t', dest='testrun', action='store_true', help='only test the formatting without renaming')
 parser.add_argument('-c', dest='custom_format', type=unicode, help='custom file name format')
@@ -85,8 +63,13 @@ def doDictFormat(s, dict):
 	format_val_arr = []
 	format_arr = re.findall('\%(.*?)\%', s)
 	for val in format_arr:
-		if (val.upper() == 'TITLE'):
-			title = getReadableString(dict['TITLE']).replace(': ', ' - ').replace(':','-').replace('/','_').replace('\\','_')
+		if (val.upper().startswith('TITLE') and val.upper() != 'TITLE_ID'):
+			title = getReadableString(dict[val.upper()])
+			# replace invalid characters for filenames
+			title = title.replace(': ', ' - ').replace(':','-').replace('|','l').replace('?','')
+			title = title.replace('/','_').replace('\\','_').replace('*','_')
+			title = title.replace('<','(').replace('>',')')
+			# replacing of reserved names like 'nul', 'com1' etc is probably not needed
 			s_f = s_f.replace('%' + val + '%', '{}')
 			format_val_arr.append(title)
 		elif val.upper() in dict:
@@ -117,16 +100,19 @@ def renamePkg(pkg_file_path):
 
 			print 'Renaming \'' + os.path.split(pkg_file_path)[1] + '\' to \'' + format_out + '\''
 			if (args.testrun == False):
-				pkg_new_file_path = os.path.dirname(os.path.abspath(pkg_file_path)) + '\\' + format_out
-				if os.path.exists(pkg_new_file_path):
-					raise pkg_parser.MyError('file \''+pkg_new_file_path+'\' already exists!')
+				if (os.path.split(pkg_file_path)[1] == format_out):
+					print '  Skipped, same filename already set.'
 				else:
-					os.rename(pkg_file_path, pkg_new_file_path)
+					pkg_new_file_path = os.path.dirname(os.path.abspath(pkg_file_path)) + '\\' + format_out
+					if os.path.exists(pkg_new_file_path):
+						raise pkg_parser.MyError('file \''+pkg_new_file_path+'\' already exists!')
+					else:
+						os.rename(pkg_file_path, pkg_new_file_path)
 
 	except pkg_parser.MyError as e:
 		print 'ERROR:', e.message
 	except:
-		print 'ERROR: unexpected error:  {} ({})'.format(sys.exc_info()[0], pkg_file_path)
+		print u'ERROR: unexpected error:  {} ({})'.format(sys.exc_info()[0], pkg_file_path)
 		traceback.print_exc(file=sys.stdout)
 
 if (args.dir):

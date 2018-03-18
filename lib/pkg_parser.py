@@ -7,6 +7,34 @@
 
 import sys, os, struct, traceback
 
+# text of available values for help texts
+AVAILABLE_VALUES = (
+	' Raw values from param.sfo like\n'
+	'  - TITLE, TITLE_ID, CONTENT_ID, VERSION, APP_VER, PARENTAL_LEVEL, \n'
+	'    SYSTEM_VER, ...\n'
+	' Formatted values, especially for version information:\n'
+	'  - LANGUAGES\n'
+	'    The list of title name languages, e.g. \'EN,FR,RU\'\n'
+	'    This does not always reflect supported languages.'
+	'  - VER\n'
+	'    Equals VERSION for a game / an application and APP_VER(U) for an update\n'
+	'  - SYS_VER\n'
+	'    The required system version number in a readable format, e.g. \'2.70\'\n'
+	'  - SDK_VER\n'
+	'    The used sdk version number in a readable format - if available - e.g. \'2.70\'\n'
+	'  - REGION\n'
+	'    The region of the pkg (CN, EU, US)\n'
+	'  - SIZE\n'
+	'    The filesize in a readable format, e.g. \'1.1 GB\'\n'
+	'  - TITLE_XX\n'
+	'    The title name in a specific language XX. If not available, the default\n'
+	'    language is used.\n'
+	'\n'
+	'    Available language codes:\n'
+	'      JA, EN, FR, ES, DE, IT, NL, PT, RU, KO, CH, ZH, FI, SV, DA,\n'
+	'      NO, PL, BR, GB, TR, LA, AR, CA, CS, HU, EL, RO, TH, VI, IN'
+	)
+
 ## utility functions
 def convert_bytes(num):
 	"this function will convert bytes to MB.... GB... etc"
@@ -230,9 +258,9 @@ def getPkgInfo(pkg_file_path):
 			return pkg_info
 
 	except IOError:
-		print 'ERROR: i/o error during processing ({})'.format(pkg_file_path)
+		print u'ERROR: i/o error during processing ({})'.format(pkg_file_path)
 	except MyError as e:
-		print 'ERROR: {} ({})'.format(e.message, pkg_file_path)
+		print u'ERROR: {} ({})'.format(e.message, pkg_file_path)
 	except:
-		print 'ERROR: unexpected error:  {} ({})'.format(sys.exc_info()[0], pkg_file_path)
+		print u'ERROR: unexpected error:  {} ({})'.format(sys.exc_info()[0], pkg_file_path)
 		traceback.print_exc(file=sys.stdout)

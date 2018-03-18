@@ -1,42 +1,20 @@
 ## pkg_list by n1ghty
-REL_VERSION = 'v1.1.1'
+REL_VERSION = 'v1.1.2'
 
 import sys, os, struct, traceback, xlsxwriter, argparse
-from lib import pkg_parser, xlsxlist
+from lib import pkg_parser, xlsxlist, common
 
 print 'pkg_tools / pkg_list ' + REL_VERSION + ' by n1ghty'
 
 ## parse arguments
-from argparse import RawTextHelpFormatter
 parser = argparse.ArgumentParser(
 	description = 'This tool parses all pkg files in the specified directory/directories recursively\n'
 											'and generates an excel sheet from the parsed infos.\n'
 											'\n'
 											'Available values for the columns:\n'
-											' - Values from param.sfo like\n'
-											'   TITLE, TITLE_ID, CONTENT_ID, VERSION, APP_VER, PARENTAL_LEVEL, \n'
-											'   SYSTEM_VER, ...\n'
-											' - LANGUAGES\n'
-											'   The list of title name languages, e.g. \'EN,FR,RU\'\n'
-											'   This does not always reflect supported languages.'
-											' - VER\n'
-											'   Equals VERSION for a game / an application and APP_VER(U) for an update\n'
-											' - REGION\n'
-											'   The region of the pkg (CN, EU, US)\n'
-											' - SIZE\n'
-											'   The filesize in a readable format, e.g. \'1.1 GB\'\n'
-											' - SYS_VER\n'
-											'   The required system version number in a readable format, e.g. \'2.70\'\n'
-											' - SDK_VER\n'
-											'   The used sdk version number in a readable format, e.g. \'2.70\'\n'
-											' - TITLE_XX\n'
-											'   The title name in a specific language XX. If not available, the default\n'
-											'   language is used.\n'
-											'\n'
-											'   Available language codes:\n'
-											'     JA, EN, FR, ES, DE, IT, NL, PT, RU, KO, CH, ZH, FI, SV, DA,\n'
-											'     NO, PL, BR, GB, TR, LA, AR, CA, CS, HU, EL, RO, TH, VI, IN',
-	formatter_class=argparse.RawDescriptionHelpFormatter)
+											+ pkg_parser.AVAILABLE_VALUES,
+	formatter_class=common.Formatter
+	)
 parser.add_argument('pkg_path', type=unicode, nargs='+', help='the path(s) to scan for pkg files')
 parser.add_argument('-r', dest='recursive', action='store_true', help='include subdirectories')
 parser.add_argument('-c', dest='column', nargs='+', help='specify the columns')
